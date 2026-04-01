@@ -1,9 +1,5 @@
 # HomeBudget — Личный финансовый менеджер
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Android](https://img.shields.io/badge/Android-8.0%2B-brightgreen)](https://developer.android.com)
-[![Java](https://img.shields.io/badge/Java-8-orange)](https://www.java.com)
-
 **HomeBudget** — это нативное Android-приложение для учёта личных финансов, разработанное в соответствии с современными стандартами Android-разработки. Приложение позволяет пользователям отслеживать доходы и расходы, управлять категориями, получать детальные отчёты с визуализацией, взаимодействовать с ИИ-ассистентом для анализа финансов и настраивать автоматические push-уведомления.
 
 ---
@@ -91,32 +87,33 @@
 ---
 
 ## 📐 Структура проекта
+
+```
 app/
 ├── src/main/java/com/homebudget/
-│ ├── adapters/ # RecyclerView адаптеры
-│ ├── database/ # Room БД и DAO
-│ │ ├── dao/ # Data Access Objects
-│ │ ├── entities/ # Сущности базы данных
-│ │ ├── migrations/ # Миграции
-│ │ └── repositories/ # Репозитории для доступа к данным
-│ ├── network/ # Сетевые сервисы (YandexGPT)
-│ ├── receivers/ # BroadcastReceiver для уведомлений
-│ ├── ui/ # UI компоненты
-│ │ ├── auth/ # Авторизация и регистрация
-│ │ ├── base/ # Базовая активность
-│ │ ├── category/ # Управление категориями
-│ │ ├── main/ # Главный экран
-│ │ ├── reports/ # Отчёты
-│ │ ├── settings/ # Настройки
-│ │ ├── splash/ # Сплеш-экран
-│ │ ├── transaction/ # Работа с транзакциями
-│ │ └── ai/ # ИИ-ассистент
-│ ├── utils/ # Утилиты (ThemeManager, SessionManager, PdfExporter и др.)
-│ ├── viewmodels/ # ViewModel классы
-│ └── workers/ # WorkManager воркеры для уведомлений
-└── src/main/res/ # Ресурсы (layout, drawable, values и др.)
-
-text
+│   ├── adapters/           # RecyclerView адаптеры
+│   ├── database/           # Room БД и DAO
+│   │   ├── dao/           # Data Access Objects
+│   │   ├── entities/      # Сущности базы данных
+│   │   ├── migrations/    # Миграции
+│   │   └── repositories/  # Репозитории для доступа к данным
+│   ├── network/           # Сетевые сервисы (YandexGPT)
+│   ├── receivers/         # BroadcastReceiver для уведомлений
+│   ├── ui/                # UI компоненты
+│   │   ├── auth/          # Авторизация и регистрация
+│   │   ├── base/          # Базовая активность
+│   │   ├── category/      # Управление категориями
+│   │   ├── main/          # Главный экран
+│   │   ├── reports/       # Отчёты
+│   │   ├── settings/      # Настройки
+│   │   ├── splash/        # Сплеш-экран
+│   │   ├── transaction/   # Работа с транзакциями
+│   │   └── ai/            # ИИ-ассистент
+│   ├── utils/             # Утилиты (ThemeManager, SessionManager, PdfExporter и др.)
+│   ├── viewmodels/        # ViewModel классы
+│   └── workers/           # WorkManager воркеры для уведомлений
+└── src/main/res/          # Ресурсы (layout, drawable, values и др.)
+```
 
 ---
 
@@ -128,74 +125,73 @@ text
 - JDK 8 или выше
 
 ### Инструкция по сборке
-
 1. Клонируйте репозиторий:
    ```bash
    git clone https://github.com/Bob-05/HomeBudget.git
-Откройте проект в Android Studio
+   ```
 
-Настройте API-ключ для YandexGPT в файле YandexGptApiService.java:
+2. Откройте проект в Android Studio
 
-java
-private static final String FOLDER_ID = "your_folder_id";
-private static final String API_KEY = "your_api_key";
-Соберите и запустите приложение на эмуляторе или устройстве
+3. Настройте API-ключ для YandexGPT в файле `YandexGptApiService.java`:
+   ```java
+   private static final String FOLDER_ID = "your_folder_id";
+   private static final String API_KEY = "your_api_key";
+   ```
 
-Создание APK
-Выберите Build → Build Bundle(s) / APK(s) → Build APK(s)
+4. Соберите и запустите приложение на эмуляторе или устройстве
 
-Готовый APK будет в app/build/outputs/apk/debug/
+### Создание APK
+- Выберите **Build → Build Bundle(s) / APK(s) → Build APK(s)**
+- Готовый APK будет в `app/build/outputs/apk/debug/`
 
-🧪 Функциональные требования (из ТЗ)
-Требование	Статус
-Регистрация с проверкой уникальности	✅
-Валидация пароля (8+ символов, буквы+цифры)	✅
-Восстановление пароля через секретный вопрос	✅
-Автоматический выход при бездействии 30 минут	✅
-Добавление/редактирование/удаление транзакций	✅
-5 предустановленных категорий	✅
-Создание/редактирование/удаление категорий	✅
-Отчёты с выбором периода	✅
-Круговая диаграмма расходов	✅
-Экспорт отчётов в PDF	✅
-ИИ-ассистент с анализом финансов	✅
-Push-уведомления с настраиваемым расписанием	✅
-Светлая/тёмная тема	✅
-🔒 Безопасность
-Пароли хранятся в хешированном виде (SHA-256)
+---
 
-Сессия пользователя сохраняется в EncryptedSharedPreferences
+## 🧪 Функциональные требования (из ТЗ)
 
-API-ключ для LLM хранится в зашифрованном виде
+| Требование | Статус |
+|------------|--------|
+| Регистрация с проверкой уникальности | ✅ |
+| Валидация пароля (8+ символов, буквы+цифры) | ✅ |
+| Восстановление пароля через секретный вопрос | ✅ |
+| Автоматический выход при бездействии 30 минут | ✅ |
+| Добавление/редактирование/удаление транзакций | ✅ |
+| 5 предустановленных категорий | ✅ |
+| Создание/редактирование/удаление категорий | ✅ |
+| Отчёты с выбором периода | ✅ |
+| Круговая диаграмма расходов | ✅ |
+| Экспорт отчётов в PDF | ✅ |
+| ИИ-ассистент с анализом финансов | ✅ |
+| Push-уведомления с настраиваемым расписанием | ✅ |
+| Светлая/тёмная тема | ✅ |
 
-SQL-запросы используют параметризацию для защиты от инъекций
+---
 
-Все сетевые запросы идут через HTTPS
+## 🔒 Безопасность
 
-📸 Скриншоты
+- Пароли хранятся в хешированном виде (SHA-256)
+- Сессия пользователя сохраняется в `EncryptedSharedPreferences`
+- API-ключ для LLM хранится в зашифрованном виде
+- SQL-запросы используют параметризацию для защиты от инъекций
+- Все сетевые запросы идут через HTTPS
+
+---
+
+## 📸 Скриншоты
+
 <div align="center">
-Сплеш-экран	Регистрация	Восстановление доступа	Вход	Главный экран
-<img src="https://github.com/user-attachments/assets/f1cda9bb-0a3b-45a9-a371-0b398b03ee3d" width="170">	<img src="https://github.com/user-attachments/assets/3ad44f1c-ccaf-462d-8e04-4fa7e09b5db6" width="170">	<img src="https://github.com/user-attachments/assets/f489360c-da35-41ed-8c10-69a68cf0fc4d" width="170">	<img src="https://github.com/user-attachments/assets/ad6d39f0-8ccd-46ca-841e-05b22c31ab5e" width="170">	<img src="https://github.com/user-attachments/assets/6e7df889-bd03-45db-a798-061c04175cc9" width="170">
-Добавление транзакции	Меню	Настройка отчёта	Отчёт с диаграммой	ИИ-ассистент
-<img src="https://github.com/user-attachments/assets/c55776c3-7876-4e08-8057-b28eca1d69cb" width="170">	<img src="https://github.com/user-attachments/assets/38b797fb-9fa3-4757-8808-ab25758e8b33" width="170">	<img src="https://github.com/user-attachments/assets/87fedeb3-dc9d-49f5-9e91-0e9cc7e7e10d" width="170">	<img src="https://github.com/user-attachments/assets/e274884b-2a32-4365-aead-c0387d6d108b" width="170">	<img src="https://github.com/user-attachments/assets/2ba0562e-f066-4ccc-bb7d-9445b70ccfb9" width="170">
+  
+| Сплеш-экран | Регистрация | Восстановление доступа | Вход | Главный экран |
+|:-----------:|:-----------:|:----------------------:|:----:|:-------------:|
+| <img src="https://github.com/user-attachments/assets/f1cda9bb-0a3b-45a9-a371-0b398b03ee3d" width="170"> | <img src="https://github.com/user-attachments/assets/3ad44f1c-ccaf-462d-8e04-4fa7e09b5db6" width="170"> | <img src="https://github.com/user-attachments/assets/f489360c-da35-41ed-8c10-69a68cf0fc4d" width="170"> | <img src="https://github.com/user-attachments/assets/ad6d39f0-8ccd-46ca-841e-05b22c31ab5e" width="170"> | <img src="https://github.com/user-attachments/assets/6e7df889-bd03-45db-a798-061c04175cc9" width="170"> |
+
+| Добавление транзакции | Меню | Настройка отчёта | Отчёт с диаграммой | ИИ-ассистент |
+|:---------------------:|:----:|:---------------:|:------------------:|:------------:|
+| <img src="https://github.com/user-attachments/assets/c55776c3-7876-4e08-8057-b28eca1d69cb" width="170"> | <img src="https://github.com/user-attachments/assets/38b797fb-9fa3-4757-8808-ab25758e8b33" width="170"> | <img src="https://github.com/user-attachments/assets/87fedeb3-dc9d-49f5-9e91-0e9cc7e7e10d" width="170"> | <img src="https://github.com/user-attachments/assets/e274884b-2a32-4365-aead-c0387d6d108b" width="170"> | <img src="https://github.com/user-attachments/assets/2ba0562e-f066-4ccc-bb7d-9445b70ccfb9" width="170"> |
+
 </div>
-👨‍💻 Разработчик
-Азизов Бахтияр
 
-Email: studentazizov@gmail.com
+---
 
-Telegram: @titan01111
+## 📄 Лицензия
 
-GitHub: Bob-05
-
-🙏 Благодарности
-YandexCloud — за предоставленный доступ к YandexGPT API
-
-Google — за Android Architecture Components
-
-PhilJay — за библиотеку MPAndroidChart
-
-📄 Лицензия
-Проект распространяется под лицензией MIT License. Подробнее см. файл LICENSE.
-
-⭐ Если вам понравился проект, поставьте звезду на GitHub!
+Проект распространяется под лицензией MIT License. Подробнее см. файл [LICENSE](LICENSE).
