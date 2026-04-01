@@ -178,7 +178,7 @@ app/
 
 ## 📄 Лицензия
 
-Проект распространяется под лицензией MIT License. Подробнее см. [файл LICENSE](https://github.com/Bob-05/HomeBudget/blob/master/LICENSE).
+Проект распространяется под лицензией MIT License. Подробнее см. файл [LICENSE](https://github.com/Bob-05/HomeBudget/blob/master/LICENSE).
 
 ---
 
