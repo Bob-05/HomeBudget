@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Основные цвета приложения для темной темы -->
+    <color name="background">#36373E</color>
+    <color name="background_card">#383838</color>
+    <color name="background_input">#C7FFB6</color>
+    <color name="background_chat_area">#595959</color>
+    <color name="rounded_button">#98F2A3</color>
+    <color name="rounded_edittext">#C7FFB6</color>
+    <color name="circle_green_background">#C7FFB6</color>
+    <color name="list_item">#6B6B6B</color>
+    <color name="item">#98F2A3</color>
+    <color name="border_card">#000000</color>
+    <color name="ic_ai">#000B88</color>
+    <color name="background_answer_ai">#1E1E1E</color>
+    <color name="background_dialog">#5F5F5F</color>
+
+    <!-- Цвета текста -->
+    <color name="text_primary">#979797</color>
+    <color name="text_secondary">#6B6B6B</color>
+    <color name="text_hint">#9E9E9E</color>
+    <color name="text_light">#999999</color>
+    <color name="text_answer_ai">#BDBDBD</color>
+
+    <!-- Акцентные цвета (можно оставить или сделать ярче для контраста) -->
+    <color name="income_green">#4CAF50</color>
+    <color name="expense_red">#F44336</color>
+    <color name="primary_green">#4CAF50</color>
+    <color name="primary_green_dark">#81C784</color>
+    <color name="button_green">#2E7D32</color>
+    <color name="button_text">#000000</color>
+
+    <!-- Цвета ссылок -->
+    <color name="link_color">#64B5F6</color>
+
+    <!-- Цвета разделителей и границ -->
+    <color name="divider">#404040</color>
+    <color name="border">#FFFFFF</color>
+
+    <!-- Цвета для иконок и кнопок -->
+    <color name="icon_background">#6B786C</color>
+
+</resources>

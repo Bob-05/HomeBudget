@@ -1,0 +1,119 @@
+HomeBudget/
+├── app/
+│   ├── build.gradle.kts
+│   ├── proguard-rules.pro
+│   └── src/
+│       └── main/
+│           ├── AndroidManifest.xml
+│           ├── java/
+│           │   └── com/
+│           │       └── homebudget/
+│           │           ├── MainActivity.java (тестовый, можно удалить)
+│           │           │
+│           │           ├── database/
+│           │           │   ├── AppDatabase.java
+│           │           │   ├── Converters.java
+│           │           │   ├── entities/
+│           │           │   │   ├── User.java
+│           │           │   │   ├── Category.java
+│           │           │   │   ├── Transaction.java
+│           │           │   │   ├── NotificationSettings.java
+│           │           │   │   └── AiChatHistory.java
+│           │           │   ├── dao/
+│           │           │   │   ├── UserDao.java
+│           │           │   │   ├── CategoryDao.java
+│           │           │   │   ├── TransactionDao.java
+│           │           │   │   ├── NotificationSettingsDao.java
+│           │           │   │   └── AiChatHistoryDao.java
+│           │           │   ├── repositories/
+│           │           │   │   ├── UserRepository.java
+│           │           │   │   ├── CategoryRepository.java
+│           │           │   │   ├── TransactionRepository.java
+│           │           │   │   ├── ReportRepository.java
+│           │           │   │   ├── NotificationRepository.java
+│           │           │   │   └── AiChatRepository.java
+│           │           │   └── migrations/
+│           │           │       └── Migration_1_2.java
+│           │           │
+│           │           ├── ui/
+│           │           │   ├── splash/
+│           │           │   │   └── SplashActivity.java
+│           │           │   ├── auth/
+│           │           │   │   ├── LoginActivity.java
+│           │           │   │   ├── RegisterActivity.java
+│           │           │   │   └── ForgotPasswordActivity.java
+│           │           │   ├── main/
+│           │           │   │   └── MainActivity.java
+│           │           │   ├── transaction/
+│           │           │   │   └── AddEditTransactionDialog.java
+│           │           │   ├── category/
+│           │           │   │   └── ManageCategoryDialog.java
+│           │           │   ├── reports/
+│           │           │   │   └── ReportDialog.java
+│           │           │   ├── settings/
+│           │           │   │   └── SettingsDialog.java
+│           │           │   └── ai/
+│           │           │       └── AiChatActivity.java
+│           │           │
+│           │           ├── viewmodels/
+│           │           │   ├── MainViewModel.java
+│           │           │   ├── AuthViewModel.java
+│           │           │   ├── ReportViewModel.java
+│           │           │   └── AiViewModel.java
+│           │           │
+│           │           ├── adapters/
+│           │           │   ├── TransactionAdapter.java
+│           │           │   └── ChatMessageAdapter.java
+│           │           │
+│           │           ├── network/
+│           │           │   └── AiApiService.java
+│           │           │
+│           │           └── utils/
+│           │               ├── DateUtils.java
+│           │               └── PasswordValidator.java
+│           │
+│           └── res/
+│               ├── layout/
+│               │   ├── activity_splash.xml
+│               │   ├── activity_login.xml
+│               │   ├── activity_register.xml
+│               │   ├── activity_forgot_password.xml
+│               │   ├── activity_main.xml
+│               │   ├── activity_ai_chat.xml
+│               │   ├── dialog_add_transaction.xml
+│               │   ├── dialog_manage_category.xml
+│               │   ├── dialog_report.xml
+│               │   ├── dialog_settings.xml
+│               │   ├── item_transaction.xml
+│               │   └── item_chat_message.xml
+│               │
+│               ├── menu/
+│               │   └── floating_menu.xml
+│               │
+│               ├── drawable/
+│               │   ├── search_background.xml
+│               │   ├── ic_arrow_up.xml
+│               │   └── ic_arrow_down.xml
+│               │
+│               ├── values/
+│               │   ├── strings.xml
+│               │   ├── colors.xml
+│               │   ├── themes.xml
+│               │   └── dimens.xml
+│               │
+│               ├── xml/
+│               │   ├── data_extraction_rules.xml
+│               │   ├── backup_rules.xml
+│               │   └── file_paths.xml
+│               │
+│               └── mipmap/ (иконки приложения)
+│
+├── gradle/
+│   └── wrapper/
+│       └── gradle-wrapper.properties
+│
+├── build.gradle.kts (корневой)
+├── settings.gradle.kts
+├── gradle.properties
+└── gradle/
+    └── libs.versions.toml

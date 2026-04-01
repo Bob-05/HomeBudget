@@ -1,0 +1,169 @@
+## **HomeBudget - Бэкенд архитектура**
+
+### **1. Общая концепция**
+Приложение **полностью офлайн** (клиент-серверная архитектура отсутствует). Бэкенд реализован на стороне клиента через:
+
+- **Room Database** (SQLite) - локальное хранилище
+- **WorkManager** - фоновые задачи (уведомления)
+- **ИИ-ассистент** - внешний API (опционально)
+
+---
+
+## **2. Схема базы данных (Room SQLite)**
+
+### **Таблицы и связи**
+
+```
+users ──┬── categories
+        ├── transactions
+        ├── notification_settings
+        └── ai_chat_history
+
+categories ── transactions (один ко многим)
+```
+
+### **Детальная структура**
+
+| Таблица | Поля | Индексы | Связи |
+|---------|------|---------|-------|
+| **users** | id (PK), login (UNIQUE), email (UNIQUE), password_hash, security_question, security_answer_hash, theme_preference, created_at, last_login | login, email | - |
+| **categories** | id (PK), user_id (FK), name, is_default, icon, color, created_at | (user_id, name) UNIQUE | user_id → users.id |
+| **transactions** | id (PK), user_id (FK), category_id (FK), type, amount, date_time, note, created_at | (user_id, date_time), (user_id, type), user_id, category_id | user_id → users.id, category_id → categories.id |
+| **notification_settings** | id (PK), user_id (FK), enabled, period, hour, minute, include_ai_summary, updated_at | user_id | user_id → users.id |
+| **ai_chat_history** | id (PK), user_id (FK), question, answer, period_start, period_end, created_at | (user_id, created_at) | user_id → users.id |
+
+### **Типы данных**
+- **type** в transactions: "income" / "expense"
+- **period** в notification_settings: "daily" / "weekly" / "monthly"
+- **theme_preference** в users: "light" / "dark" / "system"
+
+---
+
+## **3. Репозитории (Слой бизнес-логики)**
+
+### **UserRepository**
+```java
+- registerUser()              // регистрация с хешированием пароля
+- login()                     // авторизация, сохранение сессии
+- getSecurityQuestion()       // получение секретного вопроса
+- verifySecurityAnswer()      // проверка ответа
+- resetPassword()             // сброс пароля
+- updateThemePreference()     // смена темы
+- saveSession()               // сохранение сессии (EncryptedSharedPreferences)
+- isSessionExpired()          // проверка сессии (30 минут)
+```
+
+### **TransactionRepository**
+```java
+- insertTransaction()         // добавление
+- updateTransaction()         // редактирование
+- deleteTransaction()         // удаление
+- getTransactionsByUser()     // все транзакции пользователя
+- getTransactionsByDateRange() // по периоду
+- getTotalByTypeAndDateRange() // сумма доходов/расходов
+- getCategoryTotals()         // группировка по категориям
+- updateTransactionsCategory() // перенос транзакций при удалении категории
+```
+
+### **CategoryRepository**
+```java
+- insertCategory()            // добавление (проверка уникальности)
+- updateCategory()            // редактирование
+- deleteCategory()            // удаление (перенос транзакций в "Прочее")
+- getCategoriesByUser()       // все категории пользователя
+- getDefaultCategories()      // предустановленные категории
+```
+
+### **ReportRepository**
+```java
+- getReport()                 // формирование отчета:
+                              // - общая сумма доходов/расходов
+                              // - баланс
+                              // - расходы по категориям с процентами
+                              // - список транзакций за период
+```
+
+---
+
+## **4. Безопасность**
+
+| Компонент | Метод защиты |
+|-----------|--------------|
+| **Пароли** | SHA-256 хеширование |
+| **Сессия** | EncryptedSharedPreferences (AES-256-GCM) |
+| **API-ключ** (ИИ) | Android Keystore (планируется) |
+| **SQL-инъекции** | Room использует параметризованные запросы |
+| **Разграничение** | user_id во всех запросах |
+
+---
+
+## **5. Фоновые процессы**
+
+### **WorkManager (уведомления)**
+- Планирование: `PeriodicWorkRequest` (daily/weekly/monthly)
+- Точность: ±5 минут от заданного времени
+- Выживает после перезагрузки устройства
+- Канал уведомлений: "Финансовые отчеты"
+
+### **ИИ-ассистент (опционально)**
+- Внешний API (OpenAI, YandexGPT)
+- Формирование промпта с финансовыми данными пользователя
+- Офлайн-режим: сообщение об отсутствии интернета
+
+---
+
+## **6. Схема взаимодействия компонентов**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Пользовательский интерфейс                │
+│  (Activity/Fragment)                                        │
+└─────────────────────────────────────────────────────────────┘
+                              ↓ LiveData
+┌─────────────────────────────────────────────────────────────┐
+│                    ViewModels (MainViewModel, AuthViewModel) │
+│  - наблюдение за данными                                     │
+│  - обработка пользовательских действий                       │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Repositories (слой бизнес-логики)         │
+│  User, Transaction, Category, Report, Notification          │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    DAO (Data Access Objects)                 │
+│  - SQL запросы через Room                                   │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Room Database (SQLite)                    │
+│  users, categories, transactions, notification_settings,    │
+│  ai_chat_history                                            │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## **7. Внешние зависимости (бэкенд)**
+
+| Зависимость | Назначение |
+|-------------|------------|
+| **androidx.room** | ORM для SQLite |
+| **androidx.work** | Планирование уведомлений |
+| **androidx.security** | Шифрование сессии |
+| **Retrofit/OkHttp** | HTTP-запросы к ИИ API (опционально) |
+| **MPAndroidChart** | Круговая диаграмма (визуализация отчетов) |
+
+---
+
+## **8. Итог**
+
+**Бэкенд = локальная SQLite база данных** с:
+- 5 таблицами
+- Foreign key constraints
+- Индексами для производительности
+- Хешированием паролей
+- Шифрованием сессии
+- Фоновыми задачами через WorkManager
+- Опциональной интеграцией с внешним ИИ API

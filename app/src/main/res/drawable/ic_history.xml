@@ -1,0 +1,35 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="67dp"
+    android:height="72dp"
+    android:viewportWidth="67"
+    android:viewportHeight="72">
+
+    <!-- Круг растянут по ширине (радиус 33.5) и центрирован по высоте -->
+    <path
+        android:pathData="M33.5,36m-33.5,0a33.5,33.5 0,1 1,67 0a33.5,33.5 0,1 1,-67 0"
+        android:fillColor="#C7FFCE"/>
+
+    <!-- Обводка круга (с учетом толщины stroke 1, отступаем по 0.5) -->
+    <path
+        android:strokeWidth="1"
+        android:pathData="M33.5,36m-33,0a33,33 0,1 1,66 0a33,33 0,1 1,-66 0"
+        android:fillColor="#00000000"
+        android:strokeColor="#000000"/>
+
+    <!-- Линии теперь занимают почти всю ширину круга -->
+    <!-- Верхняя линия -->
+    <path
+        android:pathData="M10,28L57,28"
+        android:strokeWidth="3"
+        android:fillColor="#00000000"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"/>
+
+    <!-- Нижняя линия -->
+    <path
+        android:pathData="M10,45L52,45"
+        android:strokeWidth="3"
+        android:fillColor="#00000000"
+        android:strokeColor="#000000"
+        android:strokeLineCap="round"/>
+</vector>

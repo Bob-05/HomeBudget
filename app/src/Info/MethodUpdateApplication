@@ -1,0 +1,236 @@
+Как обновить приложение с сохранением данных:
+
+1. При первом обновлении (с версии 1 на 2):
+У вас уже есть миграция Migration_1_2, поэтому данные сохранятся.
+
+
+2. При следующих обновлениях (например, с версии 2 на 3):
+Создайте новую миграцию Migration_2_3.java:
+java
+package com.homebudget.database.migrations;
+
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
+public class Migration_2_3 extends Migration {
+
+    public Migration_2_3() {
+        super(2, 3);
+    }
+
+    @Override
+    public void migrate(SupportSQLiteDatabase database) {
+        // Если добавляете новую колонку
+        try {
+            database.execSQL("ALTER TABLE users ADD COLUMN new_column TEXT DEFAULT ''");
+        } catch (Exception e) {
+            // Колонка уже существует
+        }
+
+        // Если добавляете новую таблицу
+        // database.execSQL("CREATE TABLE IF NOT EXISTS new_table (id INTEGER PRIMARY KEY, name TEXT)");
+    }
+}
+Обновите AppDatabase.java:
+java
+@Database(
+        entities = {
+                User.class,
+                Category.class,
+                Transaction.class,
+                NotificationSettings.class,
+                AiChatHistory.class
+        },
+        version = 3,  // ← увеличиваем версию
+        exportSchema = false
+)
+Добавьте новую миграцию:
+java
+public static AppDatabase getInstance(Context context) {
+    if (INSTANCE == null) {
+        synchronized (AppDatabase.class) {
+            if (INSTANCE == null) {
+                INSTANCE = Room.databaseBuilder(
+                                context.getApplicationContext(),
+                                AppDatabase.class,
+                                DATABASE_NAME
+                        )
+                        .addMigrations(new Migration_1_2())
+                        .addMigrations(new Migration_2_3())  // ← добавляем
+                        .build();
+            }
+        }
+    }
+    return INSTANCE;
+}
+
+3. Увеличьте versionCode в build.gradle.kts:
+kotlin
+defaultConfig {
+    versionCode = 2  // Увеличиваем при каждом обновлении
+    versionName = "1.1"
+}
+Процесс обновления для пользователя:
+Друг устанавливает новый APK поверх старого
+
+Система видит, что versionCode больше (2 > 1)
+
+Room проверяет версию БД (2 → 3, если вы увеличили)
+
+Выполняются все миграции в порядке: Migration_1_2, Migration_2_3
+
+Данные сохраняются, приложение обновляется
+
+Важно:
+
+                            Действие	                |                Результат
+-------------------------------------------------------------------------------------------------|
+|Установка APK с той же подписью и бОльшим versionCode  |  ✅ Данные сохраняются                 |
+|Установка APK с другой подписью	                    |  ❌ Данные удаляются                   |
+|Удаление приложения перед установкой	                |  ❌ Данные удаляются                   |
+|Ошибка миграции без fallbackToDestructiveMigration()   |  ❌ Приложение не запускается (краш)   |
+|fallbackToDestructiveMigration() в релизе	            |  ❌ Данные удаляются при любой ошибке  |
+
+Рекомендация:
+Уберите fallbackToDestructiveMigration() и всегда пишите миграции для изменений БД. Это единственный способ сохранить данные пользователя при обновлении!
+
+
+---------------------------------------------------------------------------------------------------------
+
+Если структура БД не меняется, то не нужно создавать новую миграцию.
+
+-> Когда НУЖНА миграция:
+
+| Изменение                             | Нужна миграция |
+|---------------------------------------|----------------|
+| Добавление новой таблицы              | ✅ Да          |
+| Добавление новой колонки              | ✅ Да          |
+| Удаление колонки                      | ✅ Да          |
+| Изменение типа колонки                | ✅ Да          |
+| Переименование таблицы/колонки        | ✅ Да          |
+| Только добавление новых методов в DAO | ❌ Нет         |
+| Только изменение кода приложения      | ❌ Нет         |
+| Обновление версии `versionCode`       | ❌ Нет         |
+
+-> Если БД не меняется:
+
+ 1. Оставьте `version = 2` в `AppDatabase.java`:
+
+```java
+@Database(
+        entities = {
+                User.class,
+                Category.class,
+                Transaction.class,
+                NotificationSettings.class,
+                AiChatHistory.class
+        },
+        version = 2,  // ← не меняем
+        exportSchema = false
+)
+```
+
+### 2. **Увеличьте только `versionCode` в `build.gradle.kts`**:
+
+```kotlin
+defaultConfig {
+    versionCode = 2  // Увеличиваем при каждом обновлении
+    versionName = "1.1"
+}
+```
+
+### 3. **Уберите `fallbackToDestructiveMigration()`** (если ещё не убрали):
+
+```java
+public static AppDatabase getInstance(Context context) {
+    if (INSTANCE == null) {
+        synchronized (AppDatabase.class) {
+            if (INSTANCE == null) {
+                INSTANCE = Room.databaseBuilder(
+                                context.getApplicationContext(),
+                                AppDatabase.class,
+                                DATABASE_NAME
+                        )
+                        .addMigrations(new Migration_1_2())
+                        // .fallbackToDestructiveMigration()  ← ЗАКОММЕНТИРОВАТЬ или удалить
+                        .build();
+            }
+        }
+    }
+    return INSTANCE;
+}
+```
+
+-> Как это работает:
+
+1. Пользователь устанавливает новую версию APK (versionCode = 2)
+2. Room проверяет версию БД — она осталась 2
+3. Room понимает, что БД не изменилась и просто открывает существующую БД
+4. Данные остаются нетронутыми ✅
+
+-> Полный исправленный `AppDatabase.java`:
+
+```java
+package com.homebudget.database;
+
+import android.content.Context;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
+import com.homebudget.database.dao.*;
+import com.homebudget.database.entities.*;
+import com.homebudget.database.migrations.Migration_1_2;
+
+@Database(
+        entities = {
+                User.class,
+                Category.class,
+                Transaction.class,
+                NotificationSettings.class,
+                AiChatHistory.class
+        },
+        version = 2,  // ← не меняем, если структура БД не меняется
+        exportSchema = false
+)
+@TypeConverters({Converters.class})
+public abstract class AppDatabase extends RoomDatabase {
+
+    private static volatile AppDatabase INSTANCE;
+    private static final String DATABASE_NAME = "homebudget_database";
+
+    public abstract UserDao userDao();
+    public abstract CategoryDao categoryDao();
+    public abstract TransactionDao transactionDao();
+    public abstract NotificationSettingsDao notificationSettingsDao();
+    public abstract AiChatHistoryDao aiChatHistoryDao();
+
+    public static AppDatabase getInstance(Context context) {
+        if (INSTANCE == null) {
+            synchronized (AppDatabase.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = Room.databaseBuilder(
+                                    context.getApplicationContext(),
+                                    AppDatabase.class,
+                                    DATABASE_NAME
+                            )
+                            .addMigrations(new Migration_1_2())  // ← только если нужна
+                            // .fallbackToDestructiveMigration()  ← УДАЛИТЬ!
+                            .build();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+}
+```
+
+-> Итог:
+
+- ✅ БД не меняется** → оставляем `version = 2`, не создаём новых миграций
+- ✅ Обновляем только `versionCode` в `build.gradle.kts`
+- ✅ Убираем `fallbackToDestructiveMigration()` — она опасна в релизе
+- ✅ Данные сохранятся** при установке новой версии APK
+
+Теперь ваш друг сможет обновлять приложение простой установкой нового APK, и все его данные останутся нетронутыми! 🎉
+

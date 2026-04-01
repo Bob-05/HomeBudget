@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:paddingTop="50dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="54dp"
+            android:paddingTop="72dp"
+            android:paddingBottom="40dp">
+
+            <ImageView
+                android:layout_width="205dp"
+                android:layout_height="133dp"
+                android:layout_marginBottom="24dp"
+                app:srcCompat="@drawable/logo_1"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Регистрация"
+                android:textSize="32sp"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="24dp"
+                android:layout_gravity="start" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusBottomEnd="15dp"
+                app:boxCornerRadiusBottomStart="15dp"
+                app:boxCornerRadiusTopEnd="15dp"
+                app:boxCornerRadiusTopStart="15dp"
+                app:boxStrokeColor="@color/border"
+                app:boxBackgroundColor="@color/background_input"
+                android:textColorHint="@color/text_hint">
+
+                <EditText
+                    android:id="@+id/et_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Логин"
+                    android:inputType="text"
+                    android:textSize="16sp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="17dp"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusBottomEnd="15dp"
+                app:boxCornerRadiusBottomStart="15dp"
+                app:boxCornerRadiusTopEnd="15dp"
+                app:boxCornerRadiusTopStart="15dp"
+                app:boxStrokeColor="@color/border"
+                app:boxBackgroundColor="@color/background_input"
+                android:textColorHint="@color/text_hint">
+
+                <EditText
+                    android:id="@+id/et_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
+                    android:textSize="16sp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="17dp"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusBottomEnd="15dp"
+                app:boxCornerRadiusBottomStart="15dp"
+                app:boxCornerRadiusTopEnd="15dp"
+                app:boxCornerRadiusTopStart="15dp"
+                app:boxStrokeColor="@color/border"
+                app:boxBackgroundColor="@color/background_input"
+                app:passwordToggleEnabled="true"
+                android:textColorHint="@color/text_hint">
+
+                <EditText
+                    android:id="@+id/et_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Пароль"
+                    android:inputType="textPassword"
+                    android:textSize="16sp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="17dp"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusBottomEnd="15dp"
+                app:boxCornerRadiusBottomStart="15dp"
+                app:boxCornerRadiusTopEnd="15dp"
+                app:boxCornerRadiusTopStart="15dp"
+                app:boxStrokeColor="@color/border"
+                app:boxBackgroundColor="@color/background_input"
+                app:passwordToggleEnabled="true"
+                android:textColorHint="@color/text_hint">
+
+                <EditText
+                    android:id="@+id/et_confirm_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Подтверждение пароля"
+                    android:inputType="textPassword"
+                    android:textSize="16sp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="17dp"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Выбор доп. вопроса"
+                android:textSize="16sp"
+                android:textColor="@color/text_hint"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:paddingStart="17dp" />
+
+            <Spinner
+                android:id="@+id/sp_security_question"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_background"
+                android:paddingHorizontal="17dp"
+                android:paddingVertical="12dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ответ на доп. вопрос"
+                android:textSize="16sp"
+                android:textColor="@color/text_hint"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:paddingStart="17dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxCornerRadiusBottomEnd="15dp"
+                app:boxCornerRadiusBottomStart="15dp"
+                app:boxCornerRadiusTopEnd="15dp"
+                app:boxCornerRadiusTopStart="15dp"
+                app:boxStrokeColor="@color/border"
+                app:boxBackgroundColor="@color/background_input"
+                android:textColorHint="@color/text_hint">
+
+                <EditText
+                    android:id="@+id/et_security_answer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ответ на доп. вопрос"
+                    android:inputType="text"
+                    android:textSize="16sp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="17dp"
+                    android:textColor="@color/text_primary" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_register"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Зарегистрироваться"
+                android:textSize="16sp"
+                android:textColor="@color/button_text"
+                android:background="@drawable/rounded_button"
+                android:layout_marginBottom="16dp"
+                android:elevation="14dp"
+                android:stateListAnimator="@null" />
+
+            <TextView
+                android:id="@+id/tv_go_to_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Уже есть аккаунт?"
+                android:textColor="@color/link_color"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:paddingVertical="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

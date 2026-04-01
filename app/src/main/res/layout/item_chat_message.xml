@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="6dp">
+
+    <!-- Сообщение пользователя (вопрос) -->
+    <LinearLayout
+        android:id="@+id/question_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_question"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="280dp"
+            android:background="@drawable/bubble_user"
+            android:padding="12dp"
+            android:text="Вопрос пользователя"
+            android:textSize="14sp"
+            android:textColor="#000000"
+            android:lineSpacingExtra="2dp" />
+
+    </LinearLayout>
+
+    <!-- Сообщение ИИ (ответ) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start">
+
+        <TextView
+            android:id="@+id/tv_answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="280dp"
+            android:background="@drawable/bubble_ai"
+            android:padding="12dp"
+            android:text="Ответ ИИ-ассистента"
+            android:textSize="14sp"
+            android:textColor="@color/text_answer_ai"
+            android:lineSpacingExtra="2dp" />
+
+    </LinearLayout>
+
+    <!-- Время сообщения -->
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="10sp"
+        android:textColor="#999999"
+        android:gravity="center"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>

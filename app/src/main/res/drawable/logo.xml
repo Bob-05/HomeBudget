@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="132dp"
+    android:height="130dp"
+    android:viewportWidth="132"
+    android:viewportHeight="130">
+  <!-- Тень -->
+  <path
+      android:name="shadow_path"
+      android:pathData="M11,123.44V56.17C11,54.67 11.67,53.26 12.83,52.31L66.66,8.13C68.55,6.58 71.29,6.63 73.13,8.24L123.3,52.31C124.38,53.26 125,54.63 125,56.07V88.62V123.44"
+      android:strokeWidth="10"
+      android:strokeAlpha="0.2"
+      android:strokeColor="#000000" />
+  <!-- Основной контур -->
+  <path
+      android:name="main_path"
+      android:pathData="M9,121.44V54.17C9,52.67 9.67,51.26 10.83,50.31L64.66,6.13C66.55,4.58 69.29,4.63 71.13,6.24L121.3,50.31C122.38,51.26 123,52.63 123,54.07V86.62V121.44"
+      android:strokeWidth="10"
+      android:strokeColor="#15D82B"
+      android:strokeLineCap="round" />
+</vector>

@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">HomeBudget</string>
+    <string name="login">Вход</string>
+    <string name="register">Регистрация</string>
+    <string name="forgot_password">Забыли пароль?</string>
+    <string name="total_income">Доходы</string>
+    <string name="total_expense">Расходы</string>
+    <string name="balance">Баланс</string>
+    <string name="search">Поиск</string>
+    <string name="add_transaction">Добавить транзакцию</string>
+    <string name="add_category">Добавить категорию</string>
+    <string name="ai_assistant">ИИ-ассистент</string>
+    <string name="settings">Настройки</string>
+    <string name="reports">Отчеты</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Редактировать</string>
+</resources>
