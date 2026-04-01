@@ -176,34 +176,24 @@ app/
 
 ---
 
-## 📄 Лицензия
-
-Проект распространяется под лицензией MIT License. Подробнее см. файл [LICENSE](https://github.com/Bob-05/HomeBudget/blob/master/LICENSE).
-
----
-
 ## 📸 Скриншоты
 
 <div align="center">
   
-<img src="https://github.com/user-attachments/assets/f1cda9bb-0a3b-45a9-a371-0b398b03ee3d" width="180">
-<img src="https://github.com/user-attachments/assets/3ad44f1c-ccaf-462d-8e04-4fa7e09b5db6" width="180">
-<img src="https://github.com/user-attachments/assets/f489360c-da35-41ed-8c10-69a68cf0fc4d" width="180">
-<img src="https://github.com/user-attachments/assets/ad6d39f0-8ccd-46ca-841e-05b22c31ab5e" width="180">
-<img src="https://github.com/user-attachments/assets/6e7df889-bd03-45db-a798-061c04175cc9" width="180">
+| Сплеш-экран | Регистрация | Восстановление доступа | Вход | Главный экран |
+|:-----------:|:-----------:|:----------------------:|:----:|:-------------:|
+| <img src="https://github.com/user-attachments/assets/f1cda9bb-0a3b-45a9-a371-0b398b03ee3d" width="170"> | <img src="https://github.com/user-attachments/assets/3ad44f1c-ccaf-462d-8e04-4fa7e09b5db6" width="170"> | <img src="https://github.com/user-attachments/assets/f489360c-da35-41ed-8c10-69a68cf0fc4d" width="170"> | <img src="https://github.com/user-attachments/assets/ad6d39f0-8ccd-46ca-841e-05b22c31ab5e" width="170"> | <img src="https://github.com/user-attachments/assets/6e7df889-bd03-45db-a798-061c04175cc9" width="170"> |
 
-**Сплеш-экран** &nbsp;&nbsp;&nbsp; **Регистрация** &nbsp;&nbsp;&nbsp; **Восстановление** &nbsp;&nbsp;&nbsp; **Вход** &nbsp;&nbsp;&nbsp; **Главный экран**
-
-<br><br>
-
-<img src="https://github.com/user-attachments/assets/c55776c3-7876-4e08-8057-b28eca1d69cb" width="180">
-<img src="https://github.com/user-attachments/assets/38b797fb-9fa3-4757-8808-ab25758e8b33" width="180">
-<img src="https://github.com/user-attachments/assets/87fedeb3-dc9d-49f5-9e91-0e9cc7e7e10d" width="180">
-<img src="https://github.com/user-attachments/assets/e274884b-2a32-4365-aead-c0387d6d108b" width="180">
-<img src="https://github.com/user-attachments/assets/2ba0562e-f066-4ccc-bb7d-9445b70ccfb9" width="180">
-
-**Добавление транзакции** &nbsp;&nbsp;&nbsp; **Меню** &nbsp;&nbsp;&nbsp; **Настройка отчёта** &nbsp;&nbsp;&nbsp; **Отчёт с диаграммой** &nbsp;&nbsp;&nbsp; **ИИ-ассистент**
+| Добавление транзакции | Меню | Настройка отчёта | Отчёт с диаграммой | ИИ-ассистент |
+|:---------------------:|:----:|:---------------:|:------------------:|:------------:|
+| <img src="https://github.com/user-attachments/assets/c55776c3-7876-4e08-8057-b28eca1d69cb" width="170"> | <img src="https://github.com/user-attachments/assets/38b797fb-9fa3-4757-8808-ab25758e8b33" width="170"> | <img src="https://github.com/user-attachments/assets/87fedeb3-dc9d-49f5-9e91-0e9cc7e7e10d" width="170"> | <img src="https://github.com/user-attachments/assets/e274884b-2a32-4365-aead-c0387d6d108b" width="170"> | <img src="https://github.com/user-attachments/assets/2ba0562e-f066-4ccc-bb7d-9445b70ccfb9" width="170"> |
 
 </div>
+
+---
+
+## 📄 Лицензия
+
+Проект распространяется под лицензией MIT License. Подробнее см. файл [LICENSE](https://github.com/Bob-05/HomeBudget/blob/master/LICENSE).
 
 
