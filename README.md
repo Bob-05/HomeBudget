@@ -178,7 +178,7 @@ app/
 
 ## 📄 Лицензия
 
-Проект разработан в рамках учебного задания. Все права защищены.
+Проект распространяется под лицензией MIT License. Подробнее см. файл LICENSE.
 
 ---
 
@@ -191,8 +191,4 @@ app/
 
 ---
 
-## 🙏 Благодарности
 
-- YandexCloud за предоставленный доступ к YandexGPT API
-- Google за Android Architecture Components
-- Open-source сообщество за библиотеку MPAndroidChart
