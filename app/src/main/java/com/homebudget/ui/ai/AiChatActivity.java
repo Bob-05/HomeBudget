@@ -10,9 +10,11 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.*;
+
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.homebudget.R;
 import com.homebudget.adapters.ChatMessageAdapter;
 import com.homebudget.database.entities.AiChatHistory;
@@ -20,6 +22,7 @@ import com.homebudget.network.AiApiService;
 import com.homebudget.network.YandexGptApiService;
 import com.homebudget.ui.base.BaseActivity;
 import com.homebudget.viewmodels.AiViewModel;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -211,7 +214,6 @@ public class AiChatActivity extends BaseActivity {
         builder.setView(view);
         builder.setTitle("Настройки отчёта");
 
-        // Кнопка "Приложить к сообщению" - вставляет текст в поле ввода
         builder.setPositiveButton("Приложить к сообщению", (dialog, which) -> {
             String reportText = generateReportText();
             etMessage.setText(reportText);
@@ -219,7 +221,6 @@ public class AiChatActivity extends BaseActivity {
             Toast.makeText(this, "Отчёт добавлен в сообщение. Можете дополнить его своим текстом.", Toast.LENGTH_SHORT).show();
         });
 
-        // Кнопка "Отправить сразу" - отправляет без редактирования
         builder.setNeutralButton("Отправить сразу", (dialog, which) -> {
             sendReportRequest();
         });
@@ -234,10 +235,10 @@ public class AiChatActivity extends BaseActivity {
         Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
         if (positiveButton != null) {
-            positiveButton.setTextColor(Color.parseColor("#2196F3")); // Синий
+            positiveButton.setTextColor(Color.parseColor("#2196F3"));
         }
         if (neutralButton != null) {
-            neutralButton.setTextColor(Color.parseColor("#4CAF50")); // Зелёный
+            neutralButton.setTextColor(Color.parseColor("#4CAF50"));
         }
         if (negativeButton != null) {
             negativeButton.setTextColor(Color.parseColor("#BDBDBD"));
@@ -334,7 +335,6 @@ public class AiChatActivity extends BaseActivity {
             return;
         }
 
-        // Проверяем настройки
         loadYandexGptSettings();
 
         if (!YandexGptApiService.isConfigured()) {
@@ -350,11 +350,10 @@ public class AiChatActivity extends BaseActivity {
             return;
         }
 
-        // Сохраняем вопрос в БД
+        // Сохраняем вопрос с временным ответом
         viewModel.saveChatHistory(userId, userQuestion, "🤔 Генерирую ответ...");
         viewModel.getIsLoading().postValue(true);
 
-        // Отправляем сообщение с периодом по умолчанию (последние 30 дней)
         apiService.sendMessage(userQuestion, userId, selectedStartDate, selectedEndDate, selectedReportType, new AiApiService.AiCallback() {
             @Override
             public void onSuccess(String response) {
@@ -400,14 +399,12 @@ public class AiChatActivity extends BaseActivity {
             return;
         }
 
-        // Очищаем поле ввода
         etMessage.setText("");
 
-        // Сохраняем вопрос в БД
+        // Сохраняем вопрос с временным ответом
         viewModel.saveChatHistory(userId, userQuestion, "🤔 Генерирую ответ...");
         viewModel.getIsLoading().postValue(true);
 
-        // Отправляем сообщение с выбранным периодом и типом отчёта
         apiService.sendMessage(userQuestion, userId, selectedStartDate, selectedEndDate, selectedReportType, new AiApiService.AiCallback() {
             @Override
             public void onSuccess(String response) {

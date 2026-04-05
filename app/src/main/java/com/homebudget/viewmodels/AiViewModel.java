@@ -8,6 +8,7 @@ import com.homebudget.database.entities.AiChatHistory;
 import com.homebudget.database.repositories.AiChatRepository;
 import com.homebudget.database.repositories.UserRepository;
 import com.homebudget.network.AiApiService;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AiViewModel extends AndroidViewModel {
@@ -28,21 +29,17 @@ public class AiViewModel extends AndroidViewModel {
         apiService = new AiApiService(application);
     }
 
-    /**
-     * Загружает историю чата для пользователя
-     */
     public void loadChatHistory(int userId) {
         Log.d(TAG, "loadChatHistory for userId: " + userId);
         new Thread(() -> {
             List<AiChatHistory> history = chatRepository.getChatHistory(userId);
             Log.d(TAG, "Loaded " + (history != null ? history.size() : 0) + " messages");
-            chatHistory.postValue(history);
+            // ВАЖНО: создаём новый список, чтобы LiveData точно увидела изменение
+            List<AiChatHistory> newList = history != null ? new ArrayList<>(history) : new ArrayList<>();
+            chatHistory.postValue(newList);
         }).start();
     }
 
-    /**
-     * Отправляет сообщение в ИИ и сохраняет диалог
-     */
     public void sendMessage(String message) {
         Log.d(TAG, "sendMessage: " + message);
         isLoading.postValue(true);
@@ -54,7 +51,6 @@ public class AiViewModel extends AndroidViewModel {
             return;
         }
 
-        // Сохраняем вопрос с временным ответом
         saveChatHistory(userId, message, "🤔 Генерирую ответ...");
 
         new Thread(() -> {
@@ -78,12 +74,12 @@ public class AiViewModel extends AndroidViewModel {
     }
 
     /**
-     * Обновляет ответ в последнем сообщении чата
-     * Сделано public для вызова из AiChatActivity
+     * Обновляет ответ в сообщении чата
      */
     public void updateLastChatResponse(int userId, String question, String answer) {
         Log.d(TAG, "updateLastChatResponse for question: " + question);
         new Thread(() -> {
+            // Обновляем в БД
             List<AiChatHistory> history = chatRepository.getChatHistory(userId);
             if (history != null && !history.isEmpty()) {
                 for (AiChatHistory chat : history) {
@@ -95,35 +91,29 @@ public class AiViewModel extends AndroidViewModel {
                     }
                 }
             }
-            // Перезагружаем историю, чтобы обновить UI
-            loadChatHistory(userId);
+
+            // Загружаем свежий список и отправляем в UI
+            List<AiChatHistory> freshHistory = chatRepository.getChatHistory(userId);
+            List<AiChatHistory> newList = freshHistory != null ? new ArrayList<>(freshHistory) : new ArrayList<>();
+            chatHistory.postValue(newList);
+            Log.d(TAG, "Updated chat history posted, size: " + newList.size());
         }).start();
     }
 
-    /**
-     * Сохраняет новый диалог в историю чата
-     */
     public void saveChatHistory(int userId, String question, String answer) {
         Log.d(TAG, "saveChatHistory: " + question);
         new Thread(() -> {
             AiChatHistory chat = new AiChatHistory(userId, question, answer);
             long id = chatRepository.saveChat(chat);
             Log.d(TAG, "Saved chat with id: " + id);
-            // Перезагружаем историю после сохранения
             loadChatHistory(userId);
         }).start();
     }
 
-    /**
-     * Возвращает ID текущего пользователя
-     */
     public int getCurrentUserId() {
         return userRepository.getCurrentUserId();
     }
 
-    /**
-     * Очищает всю историю чата пользователя
-     */
     public void clearChatHistory(int userId) {
         Log.d(TAG, "clearChatHistory for userId: " + userId);
         new Thread(() -> {
@@ -132,7 +122,6 @@ public class AiViewModel extends AndroidViewModel {
         }).start();
     }
 
-    // Getters для LiveData
     public MutableLiveData<List<AiChatHistory>> getChatHistory() {
         return chatHistory;
     }

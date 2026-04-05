@@ -4,11 +4,13 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+
 import com.homebudget.database.entities.Category;
 import com.homebudget.database.entities.Transaction;
 import com.homebudget.database.dao.TransactionDao;
 import com.homebudget.database.repositories.CategoryRepository;
 import com.homebudget.database.repositories.TransactionRepository;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,12 +22,11 @@ import java.util.concurrent.Executors;
 public class AiApiService {
 
     private static final String TAG = "AiApiService";
-    private YandexGptApiService yandexGptApiService;
-    private TransactionRepository transactionRepository;
-    private CategoryRepository categoryRepository;
-    private Handler mainHandler;
-    private ExecutorService executor;
-    private Context context;
+    private final YandexGptApiService yandexGptApiService;
+    private final TransactionRepository transactionRepository;
+    private final CategoryRepository categoryRepository;
+    private final Handler mainHandler;
+    private final ExecutorService executor;
 
     public interface AiCallback {
         void onSuccess(String response);
@@ -33,7 +34,6 @@ public class AiApiService {
     }
 
     public AiApiService(Context context) {
-        this.context = context;
         this.yandexGptApiService = new YandexGptApiService(context);
         this.transactionRepository = new TransactionRepository(context);
         this.categoryRepository = new CategoryRepository(context);
@@ -41,18 +41,20 @@ public class AiApiService {
         this.executor = Executors.newSingleThreadExecutor();
     }
 
-    // Новый метод с параметрами периода
-    public void sendMessage(String message, int userId, Date startDate, Date endDate, String reportType, AiCallback callback) {
+    /**
+     * Отправляет сообщение ИИ с анализом финансов за указанный период
+     */
+    public void sendMessage(String userQuestion, int userId, Date startDate, Date endDate, String reportType, AiCallback callback) {
         if (!YandexGptApiService.isConfigured()) {
             callback.onError("❌ API-ключ или Folder ID не настроены. Настройте в главном меню.");
             return;
         }
 
-        Log.d(TAG, "sendMessage called with message: " + message);
+        Log.d(TAG, "sendMessage called with question: " + userQuestion);
         Log.d(TAG, "Period: " + startDate + " - " + endDate + ", reportType: " + reportType);
 
         executor.execute(() -> {
-            String fullPrompt = buildPromptWithFinancialData(userId, message, startDate, endDate, reportType);
+            String fullPrompt = buildPromptWithFinancialData(userId, userQuestion, startDate, endDate, reportType);
             Log.d(TAG, "Full prompt built, length: " + fullPrompt.length());
 
             yandexGptApiService.sendMessage(fullPrompt, new YandexGptApiService.AiCallback() {
@@ -71,9 +73,10 @@ public class AiApiService {
         });
     }
 
-    // Старый метод для обратной совместимости (без периода)
+    /**
+     * Старый метод для обратной совместимости (без периода)
+     */
     public void sendMessage(String message, String financialData, int userId, AiCallback callback) {
-        // Используем последние 30 дней как период по умолчанию
         Calendar cal = Calendar.getInstance();
         Date endDate = cal.getTime();
         cal.add(Calendar.MONTH, -1);
@@ -90,7 +93,6 @@ public class AiApiService {
 
         prompt.append("Ты - финансовый ассистент в приложении Budget. ");
         prompt.append("Помогай пользователю анализировать расходы, давать советы по бюджету, ");
-        prompt.append("(НЕ ИСПОЛЬЗУЙ Markdown, жирный текст, курсив, списки с * или -, заголовки), ");
         prompt.append("отвечать на вопросы о финансах. Отвечай кратко, по делу, ");
         prompt.append("используй эмодзи для наглядности. Отвечай на русском языке.\n\n");
 
@@ -98,12 +100,10 @@ public class AiApiService {
                 .append(" - ").append(sdf.format(endDate)).append("\n");
         prompt.append("📊 ТИП ОТЧЁТА: ").append(getReportTypeName(reportType)).append("\n\n");
 
-        // Получаем транзакции ЗА ВЫБРАННЫЙ период
         List<Transaction> transactions = transactionRepository.getTransactionsByDateRange(userId, startDate, endDate);
         Log.d(TAG, "Got " + (transactions != null ? transactions.size() : 0) + " transactions for period");
 
         if (transactions != null && !transactions.isEmpty()) {
-            // Считаем статистику за период
             double totalIncome = 0;
             double totalExpense = 0;
 
@@ -125,16 +125,13 @@ public class AiApiService {
                 prompt.append(String.format("💪 Норма сбережений: %.1f%%\n", savingsRate));
             }
 
-            // Получаем категории пользователя
             List<Category> categories = categoryRepository.getCategoriesByUser(userId);
 
-            // Получаем расходы по категориям за период
             List<TransactionDao.CategoryTotal> expenseByCategory =
                     transactionRepository.getCategoryTotals(userId, "expense", startDate, endDate);
 
             if (!expenseByCategory.isEmpty()) {
                 prompt.append("\n📂 РАСХОДЫ ПО КАТЕГОРИЯМ:\n");
-                // Сортируем по убыванию
                 expenseByCategory.sort((a, b) -> Double.compare(b.total, a.total));
                 int count = Math.min(5, expenseByCategory.size());
                 for (int i = 0; i < count; i++) {
@@ -145,7 +142,6 @@ public class AiApiService {
                 }
             }
 
-            // Получаем доходы по категориям за период
             List<TransactionDao.CategoryTotal> incomeByCategory =
                     transactionRepository.getCategoryTotals(userId, "income", startDate, endDate);
 
@@ -161,7 +157,6 @@ public class AiApiService {
                 }
             }
 
-            // Последние 5 транзакций для контекста (из выбранного периода)
             int transactionCount = Math.min(5, transactions.size());
             if (transactionCount > 0) {
                 prompt.append("\n📝 ПОСЛЕДНИЕ ТРАНЗАКЦИИ ЗА ПЕРИОД:\n");
