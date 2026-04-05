@@ -2,6 +2,7 @@ package com.homebudget.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -58,31 +59,36 @@ public class LoginActivity extends AppCompatActivity {
     private void setupViewModel() {
         viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
+        // Внутри setupViewModel(), после успешного входа:
         viewModel.getLoginResult().observe(this, user -> {
-            if (user != null) {
-                new Thread(() -> {
-                    User fullUser = userRepository.getUserById(user.getId());
-                    if (fullUser != null) {
-                        // Сохраняем ID пользователя
-                        userRepository.saveUserId(user.getId());
+            if (user == null) return;
 
-                        // Инициализируем сессию - устанавливаем время последней активности
-                        sessionManager.updateLastActivity();
+            Log.d("LoginActivity", "✅ Login successful for user: " + user.getLogin());
 
-                        String theme = fullUser.getThemePreference();
-                        // Применяем тему
-                        runOnUiThread(() -> {
-                            themeManager.applyTheme(theme);
-                            themeManager.saveLoginState(true);
-                        });
-                    }
+            new Thread(() -> {
+                User fullUser = userRepository.getUserById(user.getId());
+                if (fullUser != null) {
+                    userRepository.saveUserId(user.getId());
+
+                    // ИНИЦИАЛИЗИРУЕМ СЕССИЮ!
+                    sessionManager.updateLastActivity();
+                    Log.d("LoginActivity", "🕐 Session initialized");
+
+                    String theme = fullUser.getThemePreference();
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "Добро пожаловать, " + user.getLogin() + "!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        finish();
+                        themeManager.applyTheme(theme);
+                        themeManager.saveLoginState(true);
                     });
-                }).start();
-            }
+                }
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Добро пожаловать, " + user.getLogin() + "!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                });
+            }).start();
         });
 
         viewModel.getErrorMessage().observe(this, message -> {

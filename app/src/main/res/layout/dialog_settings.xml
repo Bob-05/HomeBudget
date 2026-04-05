@@ -72,7 +72,8 @@
         android:id="@+id/time_picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="12dp"
+        />
 
     <CheckBox
         android:id="@+id/cb_include_ai"

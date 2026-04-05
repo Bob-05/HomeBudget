@@ -2,6 +2,7 @@ package com.homebudget.ui.ai;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,7 @@ import com.homebudget.R;
 import com.homebudget.adapters.ChatMessageAdapter;
 import com.homebudget.database.entities.AiChatHistory;
 import com.homebudget.network.AiApiService;
+import com.homebudget.network.YandexGptApiService;
 import com.homebudget.ui.base.BaseActivity;
 import com.homebudget.viewmodels.AiViewModel;
 import java.text.SimpleDateFormat;
@@ -37,7 +39,7 @@ public class AiChatActivity extends BaseActivity {
 
     private ChatMessageAdapter adapter;
     private AiViewModel viewModel;
-    private AiApiService apiService;  // ← добавляем для прямого вызова API
+    private AiApiService apiService;
 
     private Date selectedStartDate;
     private Date selectedEndDate;
@@ -60,13 +62,14 @@ public class AiChatActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ai_chat);
 
+        loadYandexGptSettings();
+
         setupBackButton();
         initViews();
         setupViewModel();
         setupRecyclerView();
         setupClickListeners();
 
-        // Инициализируем ApiService
         apiService = new AiApiService(this);
 
         Calendar cal = Calendar.getInstance();
@@ -207,21 +210,34 @@ public class AiChatActivity extends BaseActivity {
 
         builder.setView(view);
         builder.setTitle("Настройки отчёта");
+
+        // Кнопка "Приложить к сообщению" - вставляет текст в поле ввода
         builder.setPositiveButton("Приложить к сообщению", (dialog, which) -> {
             String reportText = generateReportText();
             etMessage.setText(reportText);
             etMessage.setSelection(etMessage.getText().length());
-            Toast.makeText(this, "Отчет добавлен в сообщение", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Отчёт добавлен в сообщение. Можете дополнить его своим текстом.", Toast.LENGTH_SHORT).show();
         });
+
+        // Кнопка "Отправить сразу" - отправляет без редактирования
+        builder.setNeutralButton("Отправить сразу", (dialog, which) -> {
+            sendReportRequest();
+        });
+
         builder.setNegativeButton("Отмена", null);
 
         AlertDialog dialog = builder.create();
         dialog.show();
 
         Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
         Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
         if (positiveButton != null) {
-            positiveButton.setTextColor(Color.parseColor("#4CAF50"));
+            positiveButton.setTextColor(Color.parseColor("#2196F3")); // Синий
+        }
+        if (neutralButton != null) {
+            neutralButton.setTextColor(Color.parseColor("#4CAF50")); // Зелёный
         }
         if (negativeButton != null) {
             negativeButton.setTextColor(Color.parseColor("#BDBDBD"));
@@ -309,7 +325,7 @@ public class AiChatActivity extends BaseActivity {
     }
 
     /**
-     * Отправляет сообщение
+     * Отправляет обычное сообщение (то, что пользователь ввёл в поле)
      */
     private void sendMessage() {
         String userQuestion = etMessage.getText().toString().trim();
@@ -318,64 +334,116 @@ public class AiChatActivity extends BaseActivity {
             return;
         }
 
-        etMessage.setText("");
+        // Проверяем настройки
+        loadYandexGptSettings();
 
-        // Формируем полный промпт для API (не показывается пользователю)
-        String fullPrompt = buildFullPrompt(userQuestion);
-
-        // Сохраняем в БД только исходный вопрос пользователя
-        int userId = viewModel.getCurrentUserId();
-        if (userId != -1) {
-            viewModel.saveChatHistory(userId, userQuestion, "🤔 Генерирую ответ...");
+        if (!YandexGptApiService.isConfigured()) {
+            Toast.makeText(this, "⚠️ Сначала настройте YandexGPT в главном меню", Toast.LENGTH_LONG).show();
+            return;
         }
 
-        // Показываем индикатор загрузки
+        etMessage.setText("");
+
+        int userId = viewModel.getCurrentUserId();
+        if (userId == -1) {
+            Toast.makeText(this, "Ошибка: пользователь не авторизован", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Сохраняем вопрос в БД
+        viewModel.saveChatHistory(userId, userQuestion, "🤔 Генерирую ответ...");
         viewModel.getIsLoading().postValue(true);
 
-        // Отправляем запрос к API напрямую
-        new Thread(() -> {
-            apiService.sendMessage(fullPrompt, "", userId, new AiApiService.AiCallback() {
-                @Override
-                public void onSuccess(String response) {
-                    runOnUiThread(() -> {
-                        viewModel.getIsLoading().postValue(false);
-                        // Обновляем ответ в БД
-                        if (userId != -1) {
-                            viewModel.updateLastChatResponse(userId, userQuestion, response);
-                        }
-                    });
-                }
+        // Отправляем сообщение с периодом по умолчанию (последние 30 дней)
+        apiService.sendMessage(userQuestion, userId, selectedStartDate, selectedEndDate, selectedReportType, new AiApiService.AiCallback() {
+            @Override
+            public void onSuccess(String response) {
+                runOnUiThread(() -> {
+                    viewModel.getIsLoading().postValue(false);
+                    viewModel.updateLastChatResponse(userId, userQuestion, response);
+                });
+            }
 
-                @Override
-                public void onError(String error) {
-                    runOnUiThread(() -> {
-                        viewModel.getIsLoading().postValue(false);
-                        if (userId != -1) {
-                            viewModel.updateLastChatResponse(userId, userQuestion, "❌ Ошибка: " + error);
-                        }
-                        Toast.makeText(AiChatActivity.this, error, Toast.LENGTH_LONG).show();
-                    });
-                }
-            });
-        }).start();
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    viewModel.getIsLoading().postValue(false);
+                    viewModel.updateLastChatResponse(userId, userQuestion, "❌ " + error);
+                    Toast.makeText(AiChatActivity.this, error, Toast.LENGTH_LONG).show();
+                });
+            }
+        });
     }
 
     /**
-     * Формирует полный промпт для ИИ (не показывается в чате)
+     * Отправляет запрос на анализ отчёта с выбранными параметрами
      */
-    private String buildFullPrompt(String userQuestion) {
+    private void sendReportRequest() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        String reportTypeName = getReportTypeName(selectedReportType);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("НЕ ИСПОЛЬЗУЙ Markdown, жирный текст, курсив, списки с * или -, заголовки.\n");
-        sb.append("Пользователь хочет получить анализ финансов.\n\n");
-        sb.append("Тип отчёта: ").append(getReportTypeName(selectedReportType)).append("\n");
-        sb.append("Период: с ").append(sdf.format(selectedStartDate))
-                .append(" по ").append(sdf.format(selectedEndDate)).append("\n\n");
+        String userQuestion = "Проанализируй мои финансы за период с " +
+                sdf.format(selectedStartDate) + " по " + sdf.format(selectedEndDate) +
+                ". Тип отчета: " + reportTypeName +
+                ". Дай рекомендации по оптимизации расходов.";
 
-        sb.append("Вопрос пользователя: ").append(userQuestion);
+        loadYandexGptSettings();
 
-        return sb.toString();
+        if (!YandexGptApiService.isConfigured()) {
+            Toast.makeText(this, "⚠️ Сначала настройте YandexGPT в главном меню", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        int userId = viewModel.getCurrentUserId();
+        if (userId == -1) {
+            Toast.makeText(this, "Ошибка: пользователь не авторизован", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Очищаем поле ввода
+        etMessage.setText("");
+
+        // Сохраняем вопрос в БД
+        viewModel.saveChatHistory(userId, userQuestion, "🤔 Генерирую ответ...");
+        viewModel.getIsLoading().postValue(true);
+
+        // Отправляем сообщение с выбранным периодом и типом отчёта
+        apiService.sendMessage(userQuestion, userId, selectedStartDate, selectedEndDate, selectedReportType, new AiApiService.AiCallback() {
+            @Override
+            public void onSuccess(String response) {
+                runOnUiThread(() -> {
+                    viewModel.getIsLoading().postValue(false);
+                    viewModel.updateLastChatResponse(userId, userQuestion, response);
+                });
+            }
+
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    viewModel.getIsLoading().postValue(false);
+                    viewModel.updateLastChatResponse(userId, userQuestion, "❌ " + error);
+                    Toast.makeText(AiChatActivity.this, error, Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    private void loadYandexGptSettings() {
+        SharedPreferences prefs = getSharedPreferences("yandex_gpt_prefs", MODE_PRIVATE);
+        String apiKey = prefs.getString("api_key", "");
+        String folderId = prefs.getString("folder_id", "");
+
+        Log.d(TAG, "Loading YandexGPT settings - API Key: " + (apiKey.isEmpty() ? "empty" : "present") +
+                ", Folder ID: " + (folderId.isEmpty() ? "empty" : "present"));
+
+        if (!apiKey.isEmpty() && !folderId.isEmpty()) {
+            YandexGptApiService.setApiKey(apiKey);
+            YandexGptApiService.setFolderId(folderId);
+            YandexGptApiService.reloadSettings(this);
+            Log.d(TAG, "✅ YandexGPT settings loaded and applied");
+        } else {
+            Log.w(TAG, "⚠️ YandexGPT settings NOT found");
+        }
     }
 
     private String getReportTypeName(String reportType) {

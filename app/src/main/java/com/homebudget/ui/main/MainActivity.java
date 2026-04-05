@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -21,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,6 +50,7 @@ import com.homebudget.utils.ChartUtils;
 import com.homebudget.utils.NotificationScheduler;
 import com.homebudget.utils.PdfExporter;
 import com.homebudget.viewmodels.MainViewModel;
+import com.homebudget.network.YandexGptApiService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -86,6 +90,7 @@ public class MainActivity extends BaseActivity {
         setupSearch();
 
         loadDataAsync();
+
     }
 
     @Override
@@ -297,7 +302,7 @@ public class MainActivity extends BaseActivity {
 
     private void showMenuDialog() {
         String[] menuOptions = {"Финансовый отчет", "Настройки уведомлений",
-                "Управление категориями", "Настройки темы", "Выйти из аккаунта"};
+                "Управление категориями", "Настройки темы", "Подключить YandexGPT","О приложении", "Выйти из аккаунта"};
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.RoundedCornersDialog);
         builder.setTitle("Меню");
         builder.setItems(menuOptions, (dialog, which) -> {
@@ -315,11 +320,141 @@ public class MainActivity extends BaseActivity {
                     showThemeSettings();
                     break;
                 case 4:
+                    showInputApiYandexGPT();
+                    break;
+                case 5:
+                    showInfoApp();
+                    break;
+                case 6:
                     showLogoutDialog();
                     break;
             }
         });
         builder.show();
+    }
+
+    private void showInfoApp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.RoundedCornersDialog);
+        builder.setTitle("О приложении");
+
+        // Динамически получаем версию приложения
+        String version = "1.0.0";
+        try {
+            version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // Динамически получаем текущий год
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+
+        // Формируем текст
+        String infoText = "📱 HomeBudget\n\n" +
+                "Версия: " + version + "\n\n" +
+                "📝 Возможности приложения:\n" +
+                "• Учёт доходов и расходов\n" +
+                "• Управление категориями (5 предустановленных + свои)\n" +
+                "• Отчёты с круговой диаграммой\n" +
+                "• ИИ-ассистент для анализа финансов\n" +
+                "• Push-уведомления с периодическими отчётами\n" +
+                "• Светлая и тёмная тема\n" +
+                "• Фильтрация транзакций по дате и категории\n\n" +
+                "📦 Исходный код:\n" +
+                "https://github.com/Bob-05/HomeBudget\n\n" +
+                "© " + currentYear + " HomeBudget";
+
+        builder.setMessage(infoText);
+        builder.setPositiveButton("Закрыть", (dialog, which) -> dialog.dismiss());
+
+
+        // Кнопка для перехода на GitHub
+        builder.setNeutralButton("GitHub", (dialog, which) -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Bob-05/HomeBudget"));
+            startActivity(browserIntent);
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#BDBDBD"));
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.parseColor("#4CAF50"));
+
+    }
+
+    private void showInputApiYandexGPT() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.RoundedCornersDialog);
+        builder.setTitle("Настройка YandexGPT");
+        builder.setMessage("Введите API-ключ и Folder ID для доступа к YandexGPT");
+
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_yandex_gpt, null);
+        builder.setView(dialogView);
+
+        EditText etApiKey = dialogView.findViewById(R.id.et_api_key);
+        EditText etFolderId = dialogView.findViewById(R.id.et_folder_id);
+
+        SharedPreferences prefs = getSharedPreferences("yandex_gpt_prefs", MODE_PRIVATE);
+        String savedApiKey = prefs.getString("api_key", "");
+        String savedFolderId = prefs.getString("folder_id", "");
+
+        if (!savedApiKey.isEmpty()) {
+            etApiKey.setText(savedApiKey);
+        }
+        if (!savedFolderId.isEmpty()) {
+            etFolderId.setText(savedFolderId);
+        }
+
+        builder.setPositiveButton("Сохранить", (dialog, which) -> {
+            String apiKey = etApiKey.getText().toString().trim();
+            String folderId = etFolderId.getText().toString().trim();
+
+            if (apiKey.isEmpty() || folderId.isEmpty()) {
+                Toast.makeText(this, "Пожалуйста, заполните оба поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("api_key", apiKey);
+            editor.putString("folder_id", folderId);
+            editor.apply();
+
+            // Устанавливаем в статический класс YandexGptApiService
+            YandexGptApiService.setApiKey(apiKey);
+            YandexGptApiService.setFolderId(folderId);
+
+            // ПЕРЕЗАГРУЖАЕМ НАСТРОЙКИ
+            YandexGptApiService.reloadSettings(this);
+
+            Toast.makeText(this, "Настройки сохранены", Toast.LENGTH_SHORT).show();
+
+            // Показываем тестовое сообщение
+            Toast.makeText(this, "✅ YandexGPT настроен! Теперь можно использовать чат.", Toast.LENGTH_LONG).show();
+        });
+
+        builder.setNeutralButton("Очистить", (dialog, which) -> {
+            etApiKey.setText("");
+            etFolderId.setText("");
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.remove("api_key");
+            editor.remove("folder_id");
+            editor.apply();
+
+            YandexGptApiService.setApiKey("");
+            YandexGptApiService.setFolderId("");
+
+            // ПЕРЕЗАГРУЖАЕМ НАСТРОЙКИ
+            YandexGptApiService.reloadSettings(this);
+
+            Toast.makeText(this, "Настройки очищены", Toast.LENGTH_SHORT).show();
+        });
+
+        builder.setNegativeButton("Отмена", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.parseColor("#BDBDBD"));
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#4CAF50"));
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#BDBDBD"));
     }
 
     private void showCategoriesManagementDialog() {

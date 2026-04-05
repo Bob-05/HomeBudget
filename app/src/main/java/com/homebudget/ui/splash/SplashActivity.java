@@ -156,20 +156,18 @@ public class SplashActivity extends BaseActivity {
         new Thread(() -> {
             try {
                 int userId = userRepository.getCurrentUserId();
-                boolean isSessionValid = false;
 
                 if (userId != -1) {
-                    // Проверяем, не истекла ли сессия (30 минут бездействия)
-                    isSessionValid = !sessionManager.isSessionExpired();
+                    // Используем специальный метод проверки для запуска
+                    boolean isSessionValid = !sessionManager.isSessionExpiredOnStart();
 
                     if (isSessionValid) {
-                        // Обновляем время последней активности
                         sessionManager.updateLastActivity();
+                        sessionManager.setAppInForeground(true);
 
                         User user = userRepository.getUserById(userId);
                         if (user != null) {
                             String theme = user.getThemePreference();
-                            // Синхронизируем тему с ThemeManager (если отличается)
                             if (!theme.equals(themeManager.getCurrentTheme())) {
                                 runOnUiThread(() -> themeManager.applyTheme(theme));
                             }
@@ -183,14 +181,12 @@ public class SplashActivity extends BaseActivity {
                     }
                 }
 
-                // Если сессия невалидна или пользователь не авторизован
-                if (!isSessionValid && userId != -1) {
-                    // Очищаем сессию
+                // Сессия невалидна
+                if (userId != -1) {
                     userRepository.clearSession();
                     sessionManager.clearSession();
                 }
 
-                // Применяем системную тему перед переходом на экран входа
                 runOnUiThread(() -> {
                     themeManager.applyTheme("system");
                     themeManager.saveLoginState(false);

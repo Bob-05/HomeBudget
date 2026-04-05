@@ -3,8 +3,8 @@
         <item name="colorPrimary">@color/primary_green</item>
         <item name="colorPrimaryVariant">@color/primary_green_dark</item>
         <item name="colorOnPrimary">@android:color/white</item>
-        <item name="colorSecondary">@color/income_green</item>
-        <item name="colorSecondaryVariant">@color/income_green</item>
+        <item name="colorSecondary">#517852</item>
+        <item name="colorSecondaryVariant">#517852</item>
         <item name="colorOnSecondary">@android:color/white</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:windowBackground">@color/background</item>
