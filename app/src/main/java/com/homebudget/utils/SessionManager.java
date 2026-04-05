@@ -14,7 +14,7 @@ public class SessionManager {
     private static final String KEY_LAST_ACTIVITY_TIME = "last_activity_time";
     private static final String KEY_LAST_FOREGROUND_TIME = "last_foreground_time";
     private static final String KEY_LAST_BACKGROUND_TIME = "last_background_time";
-    private static final long SESSION_TIMEOUT_MS = 60 * 1000; // 1 минута для теста
+    private static final long SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 
     private static SessionManager instance;
     private final SharedPreferences prefs;
