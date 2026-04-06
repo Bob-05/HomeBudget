@@ -107,13 +107,14 @@
                 android:id="@+id/tv_forgot_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:paddingVertical="8dp"
                 android:text="Забыли пароль?"
                 android:textColor="@color/link_color"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
 
             <TextView
                 android:id="@+id/tv_register"
@@ -125,6 +126,18 @@
                 android:textColor="@color/link_color"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
+
+            <TextView
+                android:id="@+id/tv_agreement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingVertical="16dp"
+                android:textSize="11sp"
+                android:textColor="#888888"
+                android:linksClickable="true" />
+
 
         </LinearLayout>
     </ScrollView>

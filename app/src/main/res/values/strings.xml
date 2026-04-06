@@ -16,4 +16,11 @@
     <string name="cancel">Отмена</string>
     <string name="delete">Удалить</string>
     <string name="edit">Редактировать</string>
+
+    <!-- URLs для юридических документов -->
+    <string name="privacy_policy_url">https://github.com/Bob-05/HomeBudget/blob/master/PRIVACY.md</string>
+    <string name="terms_url">https://github.com/Bob-05/HomeBudget/blob/master/TERMS.md</string>
+
+    <!-- Текст соглашения со ссылками (обёрнут в CDATA для безопасного парсинга) -->
+    <string name="agreement_text"><![CDATA[Регистрируясь, вы соглашаетесь с <a href=\"%s\">Политикой конфиденциальности</a> и <a href=\"%s\">Условиями пользования</a>]]></string>
 </resources>

@@ -1,7 +1,10 @@
 package com.homebudget.ui.auth;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,6 +46,15 @@ public class LoginActivity extends AppCompatActivity {
         themeManager = BudgetApplication.getInstance().getThemeManager();
 
         initViews();
+
+        TextView tvAgreement = findViewById(R.id.tv_agreement);
+        String privacyUrl = getString(R.string.privacy_policy_url);
+        String termsUrl = getString(R.string.terms_url);
+        String html = String.format(getString(R.string.agreement_text), privacyUrl, termsUrl);
+        tvAgreement.setText(Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY));
+        tvAgreement.setMovementMethod(LinkMovementMethod.getInstance());
+
+
         setupViewModel();
         setupClickListeners();
     }
